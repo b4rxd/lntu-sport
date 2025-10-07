@@ -6,6 +6,7 @@ use App\Http\Controllers\Price\PriceController;
 use App\Http\Controllers\Product\ProductController;
 use App\Http\Controllers\Report\SaleReportController;
 use App\Http\Controllers\Reversal\ReversalController;
+use App\Http\Controllers\User\UserController;
 use App\Models\Reversal;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AuthController;
@@ -49,6 +50,13 @@ Route::middleware('auth')->group(function () {
     Route::post('reversal/store', [ReversalController::class, 'store'])->name('reversal.store');
 
     Route::get('/report/sale', [SaleReportController::class, 'index'])->name('report.sale.index');
+
+    Route::get('/user', [UserController::class, 'index'])->name('user.index');
+    Route::get('/user/create-user', [UserController::class, 'createUser'])->name('user.createUser');
+    Route::get('/user/create-admin', [UserController::class, 'createAdmin'])->name('user.createAdmin');
+    Route::post('/user/create-user', [UserController::class, 'storeUser'])->name('user.storeUser');
+    Route::post('/user/store-admin', [UserController::class, 'storeAdmin'])->name('user.storeAdmin');
+    Route::patch('/user/toggle/{id}', [UserController::class, 'toggle'])->name('user.toggle');
 });
 
 Route::get('/card/info', [CardController::class, 'info'])->name('card.info');

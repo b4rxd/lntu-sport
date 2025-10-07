@@ -48,6 +48,7 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
+        'id',
         'email',
         'first_name',
         'last_name',
@@ -75,7 +76,6 @@ class User extends Authenticatable
      * @var array<string, string>
      */
     protected $casts = [
-        'roles' => 'array',
         'access_list' => 'array',
         'location_access_list' => 'array',
         'is_verified' => 'boolean',

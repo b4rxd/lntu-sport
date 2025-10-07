@@ -5,7 +5,6 @@ use App\Http\Controllers\Controller;
 use App\Models\Reversal;
 use Auth;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 
 class ReversalController extends Controller
 {

@@ -42,7 +42,7 @@
                         <a href="/location/list" class="text-decoration-none text-dark">Пролонгації</a>
                         <a href="/location/list" class="text-decoration-none text-dark">Звіт потоку</a>
                         <a href={{ route('report.sale.index') }} class="text-decoration-none text-dark">Звіт продажів</a>
-                        <a href="/location/list" class="text-decoration-none text-dark">Користувачі</a>
+                        <a href={{ route('user.index') }} class="text-decoration-none text-dark">Користувачі</a>
                     @endauth
                 </nav>
 
