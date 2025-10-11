@@ -7,7 +7,6 @@ use App\Http\Controllers\Product\ProductController;
 use App\Http\Controllers\Report\SaleReportController;
 use App\Http\Controllers\Reversal\ReversalController;
 use App\Http\Controllers\User\UserController;
-use App\Models\Reversal;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AuthController;
 
