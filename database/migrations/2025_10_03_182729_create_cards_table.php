@@ -13,17 +13,12 @@ return new class extends Migration
     {
         Schema::create('cards', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->boolean('enabled')->default(true);
-            $table->integer('count_usage')->default(0);
-            $table->dateTime('valid_from');
-            $table->dateTime('valid_till');
-            $table->dateTime('last_usage')->nullable();
-            $table->uuid('created_by_id');
-            $table->uuid('price_id');
+            $table->string('barcode');
+            $table->enum('status', ['available', 'active', 'lost', 'damaged'])->default('available');
+            $table->uuid('created_by_id')->nullable();
             $table->timestamps();
 
-            $table->foreign('created_by_id')->references('id')->on('users')->onDelete('cascade');
-            $table->foreign('price_id')->references('id')->on('prices')->onDelete('cascade');
+            $table->foreign('created_by_id')->references('id')->on('users')->onDelete('set null');
         });
     }
 

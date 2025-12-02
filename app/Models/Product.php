@@ -2,26 +2,31 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Enums\ProductType;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 
 class Product extends Model
 {
-    use HasFactory;
+    use HasUuids;
 
     public $incrementing = false;
     protected $keyType = 'string';
     protected $table = 'products';
 
     protected $fillable = [
-        'id',
-        'duration_days',
         'title',
         'description',
-        'enabled',
-        'type',
-        'count_usage'
+        'type' => ProductType::class,
+        'count_usage',
+        'infinite'
     ];
+
+    protected $casts = [
+        'type' => ProductType::class,
+        'infinite' => 'boolean'
+    ];
+
 
     public function prices()
     {

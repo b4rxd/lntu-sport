@@ -11,14 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('barcodes', function (Blueprint $table) {
+        Schema::create('clients', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->string('barcode');
-            $table->uuid('card_id');
-            $table->boolean('is_generated');
+            $table->string('first_name');
+            $table->string('last_name');
+            $table->string('phone');
             $table->timestamps();
-
-            $table->foreign('card_id')->references('id')->on('cards')->onDelete('cascade');
         });
     }
 
@@ -27,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('barcodes');
+        Schema::dropIfExists('clients');
     }
 };

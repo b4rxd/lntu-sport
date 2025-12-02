@@ -15,28 +15,13 @@ class Location extends Model
     protected $keyType = 'string';
 
     protected $fillable = [
-        'enabled',
         'title',
         'description',
-    ];
-
-    protected $casts = [
-        'enabled' => 'boolean',
     ];
 
     public function regularSchedulers()
     {
         return $this->hasMany(RegularScheduler::class, 'location_id', 'id');
-    }
-    
-    public function vacationSchedulers()
-    {
-        return $this->hasMany(VacationScheduler::class, 'location_id', 'id');
-    }
-
-    public function specialSchedulers()
-    {
-        return $this->hasMany(SpecialScheduler::class, 'location_id', 'id');
     }
 
     public function products()

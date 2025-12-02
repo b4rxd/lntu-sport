@@ -2,7 +2,6 @@
 
 @push('styles')
     <link href="{{ asset('resources/css/survey.css') }}" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 @endpush
 
 @section('content')
@@ -31,9 +30,12 @@
                             
                             <ul class="list-group list-group-flush mb-3">
                                <li class="list-group-item">
-                                    Тип: {{ $types[$product->type] ?? $product->type }}
+                                    Тип: {{ $types[$product->type->value] ?? $product->type->value }}
                                 </li>
-                                <li class="list-group-item">Кількість використань: {{ $product->count_usage }}</li>
+                                <li class="list-group-item">
+                                    Кількість використань:
+                                    {{ $product->infinite ? 'безліч' : $product->count_usage }}
+                                </li>
                             </ul>
 
                             @if($product->prices->count() > 0)
@@ -43,14 +45,10 @@
                                         <li class="list-group-item d-flex justify-content-between align-items-center">
                                             {{ $price->title }} — {{ $price->amount_in_uah }} ₴
 
-                                            <form action="{{ route('prices.toggle', $price->id) }}" method="POST" class="ms-3">
+                                            <form action="{{ route('prices.destroy', $price->id) }}" method="POST" class="ms-3">
                                                 @csrf
-                                                @method('PATCH')
-                                                @if($price->enabled)
-                                                    <button type="submit" class="btn btn-sm btn-success">Активна</button>
-                                                @else
-                                                    <button type="submit" class="btn btn-sm btn-secondary">Вимкнена</button>
-                                                @endif
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-danger btn-sm w-100">Видалити</button>
                                             </form>
                                         </li>
                                     @endforeach
@@ -64,8 +62,7 @@
                                     Створити ціну
                                 </button>
 
-                                <a href="{{ route('card.create', $product->id) }}" class="btn btn-success w-100 mb-2">Продати</a>
-                                <a href="{{ route('card.createExternal', $product->id) }}" class="btn btn-success w-100 mb-2">Продати існуючу картку</a>
+                                <a href="{{ route('subscription.create', $product->id) }}" class="btn btn-success w-100 mb-2">Продати</a>
 
                                 <form class="w-100" action="{{ route('products.destroy', $product->id) }}" method="POST" onsubmit="return confirm('Точно видалити?');">
                                     @csrf
@@ -98,11 +95,6 @@
                                         <label class="form-label">Сума</label>
                                         <input type="number" step="0.01" name="amount_in_uah" class="form-control" required>
                                     </div>
-
-                                    <div class="form-check">
-                                        <input type="checkbox" class="form-check-input" name="enabled" value="1" id="enabled-{{ $product->id }}">
-                                        <label class="form-check-label" for="enabled-{{ $product->id }}">Ввімкнено</label>
-                                    </div>
                                 </div>
                                 <div class="modal-footer">
                                     <button type="submit" class="btn btn-success">Створити</button>
@@ -120,7 +112,3 @@
     @endforelse
 </div>
 @endsection
-
-@push('scripts')
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-@endpush

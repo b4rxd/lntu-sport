@@ -9,8 +9,8 @@
     <div class="card shadow-lg p-4 text-left" style="max-width: 800px; width: 100%;">
         <h1 class="mb-4 text-center">Редагування локації</h1>
 
-        <form action="{{ route('locations.update', $location->id) }}" method="POST">            @csrf
-            @csrf    
+        <form action="{{ route('locations.update', $location->id) }}" method="POST">
+            @csrf
             @method('PUT')
 
             <div class="mb-3">
@@ -25,21 +25,11 @@
 
             <hr>
 
-            <h4>Стандартний графік</h4>
+            <h4>Графік роботи</h4>
             <div id="regular-list" class="mb-3"></div>
-            <button type="button" class="btn btn-sm btn-outline-primary mb-3" onclick="addItem('regular')">Додати елемент</button>
-
-            <hr>
-
-            <h4>Графік вихідних</h4>
-            <div id="vacation-list" class="mb-3"></div>
-            <button type="button" class="btn btn-sm btn-outline-primary mb-3" onclick="addItem('vacation')">Додати елемент</button>
-
-            <hr>
-
-            <h4>Графік в нетипові дні</h4>
-            <div id="special-list" class="mb-3"></div>
-            <button type="button" class="btn btn-sm btn-outline-primary mb-3" onclick="addItem('special')">Додати елемент</button>
+            <button type="button" class="btn btn-sm btn-outline-primary mb-3" onclick="addItem('regular')">
+                Додати елемент
+            </button>
 
             <hr>
 
@@ -51,9 +41,8 @@
 <script>
     window.locationData = {
         regular: @json($regular),
-        vacation: @json($vacation),
-        special: @json($special),
     };
 </script>
-<script src="{{ asset('js/location-edit.js') }}"></script>
+
+<script src="{{ asset('js/location-edit.js') }}?v={{ time() }}"></script>
 @endsection

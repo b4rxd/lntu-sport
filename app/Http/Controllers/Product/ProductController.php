@@ -5,7 +5,6 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Models\Location;
-use Illuminate\Support\Str;
 
 class ProductController extends Controller
 {
@@ -20,25 +19,23 @@ class ProductController extends Controller
         return view('product.create-product', compact('locations'));
     }
 
-    public function store(Request $request){
-        $validated = $request->validate([
+    public function store(Request $request){    
+       $validated = $request->validate([
             'title' => 'required|string|max:255',
-            'duration_days' => 'required|integer|min:1',
-            'count_usage' => 'required|integer|min:1',
             'type' => 'required|in:one_time,monthly,yearly',
             'description' => 'required|string',
+            'infinite' => 'sometimes|boolean',
+            'count_usage' => 'required_if:infinite,0|integer|min:1|nullable',
             'locations' => 'nullable|array',
             'locations.*' => 'exists:locations,id',
         ]);
 
         $product = Product::create([
-            'id' => Str::uuid(),
             'title' => $validated['title'],
-            'duration_days' => $validated['duration_days'],
-            'count_usage' => $validated['count_usage'],
+            'count_usage' => $request->boolean('infinite') ? null : $validated['count_usage'],
+            'infinite' => $request->boolean('infinite'),
             'type' => $validated['type'],
             'description' => $validated['description'],
-            'enabled' => true,
         ]);
 
         if (!empty($validated['locations'])) {
@@ -47,6 +44,7 @@ class ProductController extends Controller
 
         return redirect()->route('products.index')->with('success', 'Success product create!');
     }
+
 
     public function destroy(Request $request, $id){
         $product = Product::findOrFail($id);

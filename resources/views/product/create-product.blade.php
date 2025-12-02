@@ -18,14 +18,19 @@
                 <input type="text" name="title" class="form-control" required>
             </div>
 
-            <div class="mb-3">
-                <label class="form-label">Термін дії (в днях)</label>
-                <input type="number" name="duration_days" class="form-control" min="1" required>
-            </div>
+            <input type="hidden" name="count_usage" value="0">
 
             <div class="mb-3">
                 <label class="form-label">Кількість використань</label>
-                <input type="number" name="count_usage" class="form-control" min="1" required>
+                <input type="number" name="count_usage" id="count_usage" class="form-control" min="1">
+            </div>
+                        
+            <div class="form-check mb-3">
+               <input type="hidden" name="infinite" value="0">
+                <input class="form-check-input" type="checkbox" name="infinite" id="infinite" value="1">
+                <label class="form-check-label" for="infinite">
+                    Безліч використань
+                </label>
             </div>
 
             <div class="mb-3">
@@ -61,3 +66,23 @@
     </div>
 </div>
 @endsection
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const infiniteCheckbox = document.getElementById('infinite');
+    const countField = document.getElementById('count_usage');
+
+    function toggleCount() {
+        if (infiniteCheckbox.checked) {
+            countField.disabled = true;
+            countField.value = '';
+        } else {
+            countField.disabled = false;
+        }
+    }
+
+    infiniteCheckbox.addEventListener('change', toggleCount);
+    toggleCount();
+});
+</script>
+@endpush

@@ -12,23 +12,24 @@
     </div>
 
     @forelse($locations as $location)
+        @php
+            $days = ['Пн','Вт','Ср','Чт','Пт','Сб','Нд'];
+            $regularByDay = collect($location->regularSchedulers)->groupBy('day_number');
+        @endphp
+
         <div class="card shadow-lg mb-4 p-3">
             <div class="row">
                 <div class="col-md-3 border-end">
                     <h4>{{ $location->title }}</h4>
                     <p>{{ $location->description }}</p>
+
                     <div class="d-flex gap-2 flex-wrap mt-2">
-                       <form class="w-100" action="{{ route('locations.toggle', $location->id) }}" method="POST">
-                            @csrf
-                            @method('PATCH')
-                            <button type="submit" class="btn btn-{{ $location->enabled ? 'warning' : 'success' }} btn-sm w-100">
-                                {{ $location->enabled ? 'Вимкнути' : 'Увімкнути' }}
-                            </button>
-                        </form>
-                        <a href="{{ route('locations.edit', $location->id) }}" class="btn btn-primary btn-sm w-100">Редагувати</a>
-                        <a href="{{ url('/location/scan-barcode/'.$location->id) }}" class="btn btn-info btn-sm w-100">Сканувати штрих-код</a>
-                        <a href="{{ url('/location/flow-report/'.$location->id) }}" class="btn btn-success btn-sm w-100">Звіт потоку</a>
-                        <form  class="w-100" action="{{ route('locations.destroy', $location->id) }}" method="POST" onsubmit="return confirm('Точно видалити?');">
+                        <a href="{{ route('locations.edit', $location->id) }}" class="btn btn-primary btn-sm w-100">
+                            Редагувати
+                        </a>
+
+                        <form class="w-100" action="{{ route('locations.destroy', $location->id) }}" method="POST"
+                              onsubmit="return confirm('Точно видалити?');">
                             @csrf
                             @method('DELETE')
                             <button type="submit" class="btn btn-danger btn-sm w-100">Видалити</button>
@@ -38,54 +39,33 @@
 
                 <div class="col-md-9">
                     <div class="mb-3">
-                        <h5>Стандартний графік</h5>
+                        <h5>Графік роботи</h5>
                         <ul class="mb-0">
-                            @forelse($location->regularSchedulers as $r)
-                                <li>
-                                    {{ \Carbon\Carbon::parse($r->date_from)->format('d.m.Y') }} 
-                                    - {{ $r->date_till ? \Carbon\Carbon::parse($r->date_till)->format('d.m.Y') : '∞' }},
-                                    День: {{ ['Пн','Вт','Ср','Чт','Пт','Сб','Нд'][$r->day_number -1] }},
-                                    {{ $r->time_from }} - {{ $r->time_till }}
-                                </li>
-                            @empty
-                                <li>Немає елементів</li>
-                            @endforelse
-                        </ul>
-                    </div>
 
-                    <div class="mb-3">
-                        <h5>Графік вихідних</h5>
-                        <ul class="mb-0">
-                            @forelse($location->vacationSchedulers as $v)
+                            @for($i = 1; $i <= 7; $i++)
                                 <li>
-                                    {{ \Carbon\Carbon::parse($v->date_from)->format('d.m.Y') }} 
-                                    - {{ $v->date_till ? \Carbon\Carbon::parse($v->date_till)->format('d.m.Y') : '∞' }},
-                                    День: {{ ['Пн','Вт','Ср','Чт','Пт','Сб','Нд'][$v->day_number -1] }},
-                                    Назва: {{ $v->title }}
-                                </li>
-                            @empty
-                                <li>Немає елементів</li>
-                            @endforelse
-                        </ul>
-                    </div>
+                                    <strong>{{ $days[$i-1] }}:</strong>
 
-                    <div>
-                        <h5>Нетипові дні</h5>
-                        <ul class="mb-0">
-                            @forelse($location->specialSchedulers as $s)
-                                <li>
-                                    {{ \Carbon\Carbon::parse($s->date_from)->format('d.m.Y') }} 
-                                    - {{ $s->date_till ? \Carbon\Carbon::parse($s->date_till)->format('d.m.Y') : '∞' }},
-                                    {{ $s->time_from }} - {{ $s->time_till }}
+                                    @if(isset($regularByDay[$i]))
+                                      @foreach($regularByDay[$i] as $r)
+                                        {{ \Carbon\Carbon::parse($r->time_from)->format('H:i') }}
+                                        –
+                                        {{ \Carbon\Carbon::parse($r->time_till)->format('H:i') }}
+                                    @endforeach
+
+                                    @else
+                                        вихідний
+                                    @endif
                                 </li>
-                            @empty
-                                <li>Немає елементів</li>
-                            @endforelse
+                            @endfor
+
                         </ul>
                     </div>
                 </div>
+
             </div>
         </div>
+
     @empty
         <p class="text-center">Локацій ще немає</p>
     @endforelse

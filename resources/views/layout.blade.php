@@ -23,6 +23,16 @@
             main {
                 flex: 1;
             }
+
+            .dropdown-menu {
+                z-index: 1055;
+                position: absolute !important;
+            }
+
+            header {
+                position: relative;
+                z-index: 1040;
+            }
         </style>
     </head>
     <body>
@@ -34,17 +44,47 @@
                 </div>
 
                 <nav class="position-absolute start-50 translate-middle-x d-none d-md-flex gap-4">
-                    <a href="{{ route('card.info') }}" class="text-decoration-none text-dark">Інформація по штрих-коду</a>
+                    @guest
+                        <a href="{{ route('card.info') }}" class="text-decoration-none text-dark">
+                            Інформація по штрих-коду
+                        </a>
+                    @endguest
+
                     @auth
-                        <a href="{{ route('locations.index') }}" class="text-decoration-none text-dark">Локації</a>
-                        <a href="{{ route('products.index') }}" class="text-decoration-none text-dark">Продукти</a>
-                        <a href="{{ route('reversal.index') }}" class="text-decoration-none text-dark">Повернення</a>
-                        <a href="/location/list" class="text-decoration-none text-dark">Пролонгації</a>
-                        <a href="/location/list" class="text-decoration-none text-dark">Звіт потоку</a>
-                        <a href={{ route('report.sale.index') }} class="text-decoration-none text-dark">Звіт продажів</a>
-                        <a href={{ route('user.index') }} class="text-decoration-none text-dark">Користувачі</a>
+                        <div class="dropdown">
+                            <a class="text-decoration-none text-dark dropdown-toggle" href="#" data-bs-toggle="dropdown">
+                                Пошук
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="{{ route('card.info') }}">Пошук картки</a></li>
+                                <li><a class="dropdown-item" href="{{ route('client.index') }}">Пошук клієнта</a></li>
+                            </ul>
+                        </div>
+                        <div class="dropdown">
+                            <a class="text-decoration-none text-dark dropdown-toggle" href="#" data-bs-toggle="dropdown">
+                                Управління
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="{{ route('locations.index') }}">Локації</a></li>
+                                <li><a class="dropdown-item" href="{{ route('products.index') }}">Продукти</a></li>
+                                <!-- <li><a class="dropdown-item" href="{{ route('reversal.index') }}">Повернення</a></li>
+                                <li><a class="dropdown-item" href="/location/list">Пролонгації</a></li> -->
+                            </ul>
+                        </div>
+
+                        <div class="dropdown">
+                            <a class="text-decoration-none text-dark dropdown-toggle" href="#" data-bs-toggle="dropdown">
+                                Звіти
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="{{ route('visit.index') }}">Звіт потоку</a></li>
+                                <li><a class="dropdown-item" href="{{ route('report.sale.index') }}">Продажі</a></li>
+                            </ul>
+                        </div>
+                        <a class="dropdown-item" href="{{ route('user.index') }}">Користувачі</a>
                     @endauth
                 </nav>
+
 
                 <div>
                     <div>

@@ -9,20 +9,17 @@ git clone https://github.com/b4rxd/lntu-sport.git
 cd lntu-sport
 composer install
 npm i
-php artisan migrate
+php artisan migrate --seed
 ```
 
 ### Run local
-
-Create first admin user manual or use sql request for create default admin with credential:
-- email: qweqwe@qweqwe.qwe (or change it in request)
-- password: qweqwe 
-```sql
-INSERT INTO users (id, email, roles, password, is_verified, first_name, last_name, access_list, location_access_list, enabled, created_at, updated_at) VALUES ('f39c29bb-5122-4435-8421-4debc91a1d3d', 'qweqwe@qweqwe.qwe', 'admin', '$2y$13$AEk1O0pfLBvZFUB3ljOv6OWq/4QMMadacu8WEZtMLLP0Zh/0yZWe.', 1, 'default', 'admin', '{}', '{}', 1, now(), now());
-```
 
 Then run in separate terminals
 ```shell
 npm run dev
 php artisan serve
 ```
+
+Default admin credentials:
+- email: qweqwe@qweqwe.qwe
+- password: qweqwe

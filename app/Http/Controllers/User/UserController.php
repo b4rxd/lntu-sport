@@ -1,12 +1,11 @@
 <?php
 
 namespace App\Http\Controllers\User;
+use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
 use App\Models\User;
-use Auth;
 use Hash;
 use Illuminate\Http\Request;
-use Str;
 
 class UserController extends Controller
 {
@@ -33,11 +32,10 @@ class UserController extends Controller
         ]);
 
         User::create([
-            'id' => Str::uuid(),
             'email' => $validated['email'],
             'first_name' => $validated['first_name'],
             'last_name' => $validated['last_name'],
-            'roles' => 'admin',
+            'role' => UserRole::ADMIN,
             'password' => Hash::make($validated['password'])
         ]);
 
@@ -54,11 +52,10 @@ class UserController extends Controller
         ]);
 
         User::create([
-            'id' => Str::uuid(),
             'email' => $validated['email'],
             'first_name' => $validated['first_name'],
             'last_name' => $validated['last_name'],
-            'roles' => 'user',
+            'role' => UserRole::USER,
             'access_list' => $validated['permissions'] ?? [],
             'password' => Hash::make($validated['password'])
         ]);

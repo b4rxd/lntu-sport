@@ -11,15 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('reversals', function (Blueprint $table) {
+        Schema::create('visit_log', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->string('amount_in_uah');
-            $table->uuid('subscription_id')->nullable();;
-            $table->uuid('created_by_id')->nullable();;
+            $table->uuid('subscription_id')->nullable();
+            $table->uuid('location_id')->nullable();
+            $table->uuid('created_by_id')->nullable();
+            $table->enum('type', ['entry', 'exit']);
             $table->timestamps();
 
-            $table->foreign('created_by_id')->references('id')->on('users')->onDelete('set null');
             $table->foreign('subscription_id')->references('id')->on('subscriptions')->onDelete('set null');
+            $table->foreign('location_id')->references('id')->on('locations')->onDelete('set null');
+            $table->foreign('created_by_id')->references('id')->on('users')->onDelete('set null');
         });
     }
 
@@ -28,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('reversals');
+        Schema::dropIfExists('visit_log');
     }
 };

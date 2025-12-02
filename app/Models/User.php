@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Enums\UserRole;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
 
 /**
  * App\Models\User
@@ -25,7 +25,7 @@ use Illuminate\Notifications\Notifiable;
  */
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable;
+    use HasUuids;
 
     /**
      * The table associated with the model.
@@ -48,11 +48,10 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
-        'id',
         'email',
         'first_name',
         'last_name',
-        'roles',
+        'role' => UserRole::class,
         'access_list',
         'location_access_list',
         'password',

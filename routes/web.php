@@ -1,12 +1,15 @@
 <?php
 
 use App\Http\Controllers\Card\CardController;
+use App\Http\Controllers\Client\ClientController;
 use App\Http\Controllers\Location\LocationController;
 use App\Http\Controllers\Price\PriceController;
 use App\Http\Controllers\Product\ProductController;
 use App\Http\Controllers\Report\SaleReportController;
 use App\Http\Controllers\Reversal\ReversalController;
+use App\Http\Controllers\Subscription\SubscriptionController;
 use App\Http\Controllers\User\UserController;
+use App\Http\Controllers\Visit\VisitController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AuthController;
 
@@ -35,14 +38,10 @@ Route::middleware('auth')->group(function () {
     Route::delete('/products/{id}', [ProductController::class, 'destroy'])->name('products.destroy');
 
     Route::post('/products/prices', [PriceController::class, 'store'])->name('prices.store');
-    Route::patch('/prices/{id}/toggle', [PriceController::class, 'toggle'])->name('prices.toggle');
+    Route::delete('/prices/{id}', [PriceController::class, 'destroy'])->name('prices.destroy');
 
-    Route::get('/card/create/{id}', [CardController::class, 'create'])->name('card.create');
-    Route::post('/card/create', [CardController::class, 'store'])->name('card.store');
-    Route::get('/card/create-external/{id}', [CardController::class, 'createExternal'])->name('card.createExternal');
-    Route::post('/card/create-external', [CardController::class, 'storeExternal'])->name('card.storeExternal');
-    Route::get('/card/print/view/{id}', [CardController::class, 'print'])->name('name.print');
-    Route::get('/card/print/pdf/{id}', [CardController::class, 'printPdf'])->name('card.print.pdf');
+    Route::get('/subscription/create/{id}', [SubscriptionController::class, 'create'])->name('subscription.create');
+    Route::post('/subscription/create', [SubscriptionController::class, 'store'])->name('subscription.store');
 
     Route::get('/reversal', [ReversalController::class, 'index'])->name('reversal.index');
     Route::get('/reversal/create', [ReversalController::class, 'create'])->name('reversal.create');
@@ -56,6 +55,14 @@ Route::middleware('auth')->group(function () {
     Route::post('/user/create-user', [UserController::class, 'storeUser'])->name('user.storeUser');
     Route::post('/user/store-admin', [UserController::class, 'storeAdmin'])->name('user.storeAdmin');
     Route::patch('/user/toggle/{id}', [UserController::class, 'toggle'])->name('user.toggle');
+
+    
+    Route::get('/clients', [ClientController::class, 'index'])->name('client.index');
+    Route::get('/clients/search', [ClientController::class, 'search']);
+    Route::get('/clients/info/{id}', [ClientController::class, 'info']);
+
+    Route::get('/visit', [VisitController::class, 'index'])->name('visit.index');
+    Route::post('/visit', [VisitController::class, 'store'])->name('visit.store');
 });
 
 Route::get('/card/info', [CardController::class, 'info'])->name('card.info');

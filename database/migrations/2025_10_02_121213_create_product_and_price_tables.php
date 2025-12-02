@@ -12,14 +12,12 @@ return new class extends Migration {
     {
         Schema::create('products', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->unsignedInteger('duration_days');
             $table->string('title');
             $table->longText('description');
-            $table->boolean('enabled');
-            $table->string('type');
-            $table->unsignedInteger('count_usage');
-            $table->dateTime('created_at')->useCurrent();
-            $table->dateTime('updated_at')->useCurrent()->useCurrentOnUpdate();
+            $table->enum('type', ['monthly', 'yearly', 'one_time']);
+            $table->unsignedInteger('count_usage')->nullable();
+            $table->boolean('infinite')->default(false);
+            $table->timestamps();
         });
 
         Schema::create('prices', function (Blueprint $table) {
@@ -27,14 +25,10 @@ return new class extends Migration {
             $table->uuid('product_id')->nullable();
             $table->string('title');
             $table->string('amount_in_uah');
-            $table->boolean('enabled');
             $table->dateTime('created_at')->useCurrent();
             $table->dateTime('updated_at')->useCurrent()->useCurrentOnUpdate();
 
-            $table->foreign('product_id')
-                  ->references('id')
-                  ->on('products')
-                  ->onDelete('cascade');
+            $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
         });
     }
 

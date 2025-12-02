@@ -2,13 +2,12 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 
 class Reversal extends Model
 {
-    use HasFactory, HasUuids;
+    use HasUuids;
 
     protected $table = 'reversals';
     public $incrementing = false;
@@ -18,10 +17,6 @@ class Reversal extends Model
         'amount_in_uah',
         'card_id',
         'created_by_id'
-    ];
-
-    protected $casts = [
-
     ];
 
     public function card(){

@@ -13,11 +13,10 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->string('first_name');
             $table->string('last_name');
-            $table->string('roles')->nullable();
+            $table->enum('role', ['user', 'admin']);
             $table->json('access_list')->nullable();
             $table->json('location_access_list')->nullable();
             $table->string('password')->nullable();
-            $table->boolean('is_verified')->default(false);
             $table->boolean('enabled')->default(true);
             $table->timestamps();
         });
@@ -25,6 +24,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('user');
+        Schema::dropIfExists('users');
     }
 };

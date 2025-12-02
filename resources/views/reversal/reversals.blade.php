@@ -1,12 +1,8 @@
 @extends('layout')
 
-@push('styles')
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-@endpush
-
 @section('content')
 <div class="container mt-4">
-    <h1 class="mb-4 text-center">Список реверсів</h1>
+    <h1 class="mb-4 text-center">Список повернень</h1>
     <div class="text-end mt-3 mb-3">
         <a href="{{ route('reversal.create') }}" class="btn btn-success">Зробити повернення</a>
     </div>
@@ -41,11 +37,7 @@
             </table>
         </div>
     @else
-        <p class="text-center text-muted">Реверсів ще немає</p>
+        <p class="text-center text-muted">Повернень ще немає</p>
     @endif
 </div>
 @endsection
-
-@push('scripts')
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-@endpush

@@ -25,21 +25,12 @@
 
             <hr>
 
-            <h4>Стандартний графік</h4>
+            <h4>Графік роботи</h4>
             <div id="regular-list" class="mb-3"></div>
-            <button type="button" class="btn btn-sm btn-outline-primary mb-3" onclick="addItem('regular')">Додати елемент</button>
+            <button type="button" class="btn btn-sm btn-outline-primary mb-3" onclick="addItem('regular')">
+                Додати елемент
+            </button>
 
-            <hr>
-
-            <h4>Графік вихідних</h4>
-            <div id="vacation-list" class="mb-3"></div>
-            <button type="button" class="btn btn-sm btn-outline-primary mb-3" onclick="addItem('vacation')">Додати елемент</button>
-            
-            <hr>
-
-            <h4>Графік в нетипові дні</h4>
-            <div id="special-list" class="mb-3"></div>
-            <button type="button" class="btn btn-sm btn-outline-primary mb-3" onclick="addItem('special')">Додати елемент</button>
             
             <hr>
 

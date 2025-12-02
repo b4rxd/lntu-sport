@@ -1,7 +1,15 @@
 @extends('layout')
 
 @push('styles')
-    <link href="{{ asset('resources/css/survey.css') }}" rel="stylesheet">
+<style>
+    .info-block {
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        padding: 15px;
+        margin-bottom: 15px;
+        background-color: #f9f9f9;
+    }
+</style>
 @endpush
 
 @section('content')
@@ -20,7 +28,7 @@
 </div>
 
 <div class="modal fade" id="cardModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog">
+  <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title">Інформація про карту</h5>
@@ -30,17 +38,40 @@
     </div>
   </div>
 </div>
+
+{{-- Toast container --}}
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 9999">
+    <div id="toastMessage" class="toast align-items-center text-bg-primary border-0" role="alert">
+        <div class="d-flex">
+            <div class="toast-body" id="toastBody"></div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    </div>
+</div>
+
 @endsection
 
 @push('scripts')
-<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 <script>
-$(document).ready(function() {
-    var modalEl = document.getElementById('cardModal');
-    var cardModal = new bootstrap.Modal(modalEl);
+document.addEventListener('DOMContentLoaded', function () {
+    const form = document.getElementById('barcodeForm');
+    const modalEl = document.getElementById('cardModal');
+    const cardModal = new bootstrap.Modal(modalEl);
+
+    // Toast function
+    function showToast(message, type = 'primary') {
+        const toastEl = document.getElementById('toastMessage');
+        const toastBody = document.getElementById('toastBody');
+
+        toastBody.textContent = message;
+        toastEl.className = `toast align-items-center text-bg-${type} border-0`;
+
+        const toast = new bootstrap.Toast(toastEl, { delay: 3000 });
+        toast.show();
+    }
 
     function formatDate(dateStr) {
-        if (!dateStr) return '-';
+        if (!dateStr) return '—';
         const date = new Date(dateStr);
         return date.toLocaleDateString('uk-UA', {
             day: '2-digit',
@@ -49,39 +80,128 @@ $(document).ready(function() {
         });
     }
 
-    $('#barcodeForm').on('submit', function(e) {
+    form.addEventListener('submit', function (e) {
         e.preventDefault();
-        let barcode = $('#barcodeInput').val();
-        let token = $('input[name="_token"]').val();
+        const barcode = document.getElementById('barcodeInput').value.trim();
+        const token = document.querySelector('input[name="_token"]').value;
 
-        $.ajax({
-            url: "/card/info/" + barcode,
-            type: 'POST',
-            data: {_token: token},
-            success: function(response) {
-                let statusText = response.isRevers ? 'Не доступно' : 'Доступно';
-                let statusColor = response.isRevers ? 'text-danger' : 'text-success';
-                let reversedMessage = response.isRevers ? '<p class="text-danger mt-2">Було здійснено повернення цієї картки</p>' : '';
+        if (!barcode) return;
 
-                $('#cardModalBody').html(`
-                    ${reversedMessage}
-                    <p><strong>Статус карти:</strong> <span class="${statusColor}">${statusText}</span></p>
-                    <p><strong>Дійсний від:</strong> ${formatDate(response.valid_from)}</p>
-                    <p><strong>Дійсний до:</strong> ${formatDate(response.valid_till)}</p>
-                    <p><strong>Використано:</strong> ${response.count_usage}</p>
-                    <p><strong>Залишилось використань:</strong> ${response.max_usage}</p>
-                `);
-
-                cardModal.show();
+        fetch(`/card/info/${barcode}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': token
             },
-            error: function() {
-                alert('Карту не знайдено');
+            body: JSON.stringify({})
+        })
+        .then(res => {
+            if (!res.ok) throw new Error();
+            return res.json();
+        })
+        .then(data => {
+            if (!data || !data.id) {
+                showToast('Карту не знайдено', 'warning');
+                return;
             }
+
+            let html = `
+                <div class="info-block">
+                    <h5>Дані карти</h5>
+                    <p><strong>Штрих-код:</strong> ${data.barcode ?? '—'}</p>
+                    <p><strong>Статус:</strong> ${data.status ?? '—'}</p>
+                    <p><strong>Дата створення:</strong> ${formatDate(data.created_at)}</p>
+                </div>
+            `;
+
+            if (data.client) {
+                const c = data.client;
+                html += `
+                    <div class="info-block">
+                        <h5>Карта прив’язана до клієнта</h5>
+                        <p><strong>Ім’я:</strong> ${c.first_name ?? '—'}</p>
+                        <p><strong>Прізвище:</strong> ${c.last_name ?? '—'}</p>
+                        <p><strong>Телефон:</strong> ${c.phone ?? '—'}</p>
+                        <p><strong>Дата видачі:</strong> ${formatDate(c.assigned_date)}</p>
+                    </div>
+                `;
+            } else {
+                html += `<p class="text-muted text-center mt-3">Картка наразі не прив’язана до жодного клієнта</p>`;
+            }
+
+            if (data.subscription) {
+                const s = data.subscription;
+                html += `
+                    <div class="info-block">
+                        <h5>Підписка</h5>
+                        <p><strong>Дійсна до:</strong> ${formatDate(s.end_date)}</p>
+                        ${s.product ? `<p><strong>Продукт:</strong> ${s.product.title}</p>` : ''}
+                        ${s.price ? `<p><strong>Ціна:</strong> ${s.price.amount_in_uah} грн (${s.price.title})</p>` : ''}
+                        ${s.last_payment ? `<p><strong>Остання оплата:</strong> ${s.last_payment.paid_amount} грн, ${formatDate(s.last_payment.paid_at)}</p>` : '<p><em>Оплат ще не було</em></p>'}
+                    </div>
+                `;
+            }
+
+            if (data.locations && data.locations.length > 0) {
+                html += `<div class="info-block">
+                            <h5>Локації, де дійсна карта</h5>
+                            <ul>`;
+                data.locations.forEach(loc => {
+                    html += `<li>${loc.title}</li>`;
+                });
+                html += `</ul></div>`;
+            }
+
+            html += `
+                <div class="d-flex mt-3" style="gap: 10px;">
+                    <button type="button" class="btn btn-success" id="enterCardBtn">Вхід</button>
+                    <button type="button" class="btn btn-warning" id="returnCardBtn">Повернути картку</button>
+                    <button type="button" class="btn btn-primary" id="renewSubscriptionBtn">Продовжити абонемент</button>
+                </div>
+            `;
+
+            document.getElementById('cardModalBody').innerHTML = html;
+            cardModal.show();
+
+            document.getElementById('enterCardBtn').onclick = function() {
+                if (!confirm('Підтвердити вхід?')) return;
+
+                const subscriptionId = data.subscription?.id;
+                const locationId = data.locations && data.locations.length > 0 ? data.locations[0].id : null;
+
+                if (!subscriptionId || !locationId) {
+                    showToast('Неможливо зафіксувати візит: відсутня підписка або локація', 'danger');
+                    return;
+                }
+
+                fetch('/visit', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': token
+                    },
+                    body: JSON.stringify({ subscription_id: subscriptionId, location_id: locationId })
+                })
+                .then(async res => {
+                    const data = await res.json();
+
+                    if (res.ok && data.success) {
+                        showToast('Візит зафіксовано!', 'success');
+                        cardModal.hide();
+                    } else {
+                        showToast(data.message ?? 'Сталася помилка при створенні візиту.', 'danger');
+                    }
+                })
+                .catch(() => showToast('Сталася помилка при створенні візиту.', 'danger'));
+            };
+        })
+        .catch(() => {
+            showToast('Карту не знайдено або сталася помилка.', 'warning');
         });
     });
 
     modalEl.addEventListener('hidden.bs.modal', function () {
-        $('#cardModalBody').html('');
+        document.getElementById('cardModalBody').innerHTML = '';
     });
 });
 </script>

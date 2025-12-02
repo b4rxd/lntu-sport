@@ -16,18 +16,12 @@ class RegularScheduler extends Model
 
     protected $fillable = [
         'location_id',
-        'date_from',
-        'date_till',
         'day_number',
         'time_from',
-        'time_till',
-        'enabled',
+        'time_till'
     ];
 
     protected $casts = [
-        'enabled' => 'boolean',
-        'date_from' => 'datetime',
-        'date_till' => 'datetime',
         'time_from' => 'datetime:H:i:s',
         'time_till' => 'datetime:H:i:s',
     ];
