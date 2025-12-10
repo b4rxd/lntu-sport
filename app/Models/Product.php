@@ -19,12 +19,14 @@ class Product extends Model
         'description',
         'type' => ProductType::class,
         'count_usage',
-        'infinite'
+        'infinite',
+        'enabled'
     ];
 
     protected $casts = [
         'type' => ProductType::class,
-        'infinite' => 'boolean'
+        'infinite' => 'boolean',
+        'enabled' => 'boolean'
     ];
 
 

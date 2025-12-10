@@ -17,6 +17,7 @@ return new class extends Migration {
             $table->enum('type', ['monthly', 'yearly', 'one_time']);
             $table->unsignedInteger('count_usage')->nullable();
             $table->boolean('infinite')->default(false);
+            $table->boolean('enabled')->default(true);
             $table->timestamps();
         });
 
@@ -27,6 +28,7 @@ return new class extends Migration {
             $table->string('amount_in_uah');
             $table->dateTime('created_at')->useCurrent();
             $table->dateTime('updated_at')->useCurrent()->useCurrentOnUpdate();
+            $table->boolean('enabled')->default(true);
 
             $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
         });

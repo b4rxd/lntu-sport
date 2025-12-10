@@ -10,9 +10,11 @@ use App\Http\Requests\StoreLocationRequest;
 class LocationController extends Controller
 {
     public function index(){
-        $locations = Location::all();
+        $locations = Location::where('enabled', true)->get();
+
         return view('location.location-list', compact('locations'));
     }
+
 
     public function create(){
         return view('location.create-location');
@@ -83,7 +85,8 @@ class LocationController extends Controller
 
     public function destroy(Request $request, $id){
         $location = Location::findOrFail($id);
-        $location->delete();
+        $location->enabled = false;
+        $location->save();
         
         return redirect()->route('locations.index')
                 ->with('success', 'Succsess delete');

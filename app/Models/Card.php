@@ -17,11 +17,12 @@ class Card extends Model
 
     protected $fillable = [
         'barcode',
-        'status' => CardStatus::class,
+        'status',
         'created_by_id'
     ];
 
     protected $casts = [
+        'status' => CardStatus::class,
         'issued_date' => 'datetime',
         'returned_date' => 'datetime',
     ];

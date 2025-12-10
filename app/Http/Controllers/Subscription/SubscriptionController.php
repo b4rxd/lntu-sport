@@ -46,11 +46,11 @@ class SubscriptionController extends Controller{
             ]);
         }
 
-        $card = Card::firstOrCreate(
+        $card = Card::updateOrCreate(
             ['barcode' => $validated['barcode']],
             [
                 'status' => CardStatus::ACTIVE,
-                'created_by_id' => Auth::user()->id
+                'created_by_id' => Auth::id()
             ]
         );
 
@@ -85,5 +85,64 @@ class SubscriptionController extends Controller{
         ]);
 
         return redirect("/")->with('success', 'Card created!');
+    }
+
+    public function prolongation(Request $request, $id){
+        $card = Card::where('id', $id)
+            ->with(['subscription.price.product'])
+            ->firstOrFail();
+        
+        $subscription = $card->subscription;
+        $price = $subscription->price;
+
+        if (!$subscription) {
+            return response()->json(['message' => "Картка не прив'язана"], 400);
+        }
+
+        $product = $subscription->price->product;
+
+        $end = $subscription->end_date;
+
+        if (!$end || $end->toDateString() < Carbon::today()->toDateString()) {
+            $currentEnd = Carbon::today();
+        } else {
+            $currentEnd = $end->copy();
+        }
+
+        switch ($product->type) {
+            case ProductType::MONTHLY:
+                $newEnd = $currentEnd->copy()->addMonth();
+                break;
+
+            case ProductType::YEARLY:
+                $newEnd = $currentEnd->copy()->addYear();
+                break;
+
+            case ProductType::ONETIME:
+                return response()->json([
+                    'message' => 'Одноразовий абонемент не можна продовжити'
+                ], 400);
+        }
+
+        $newCountUsage = $subscription->count_usage;
+
+        if (!$product->infinite) {
+            $newCountUsage = $product->count_usage;
+        }
+
+        $subscription->update([
+            'end_date'     => $newEnd,
+            'count_usage'  => $newCountUsage
+        ]);
+
+        SubscriptionPayment::create([
+            'subscription_id' => $subscription->id,
+            'price_id'        => $price->id,
+            'paid_amount'     => $price->amount_in_uah,
+        ]);
+
+        return response()->json([
+            'message' => 'Абонемент продовжено',
+        ]);
     }
 }

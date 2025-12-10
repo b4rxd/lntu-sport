@@ -47,9 +47,11 @@ class CardController extends Controller
             'subscription' => $subscription ? [
                 'id' => $subscription->id, 
                 'end_date' => $subscription->end_date,
+                'count_usage' => $subscription->count_usage,
                 'product' => $product ? [
                     'id' => $product->id,
                     'title' => $product->title,
+                    'infinite' => $product->infinite
                 ] : null,
                 'price' => $price ? [
                     'id' => $price->id,
@@ -70,4 +72,29 @@ class CardController extends Controller
         ]);
     }
 
+    public function returnCard(Request $request, $id){
+        $card = Card::where('id', $id)->with([
+            'cardAssignments' => function ($query) {
+                $query->whereNull('returned_date')->limit(1);
+            },'subscription'
+        ])->first();
+
+        $assignment = $card->cardAssignments->first();
+
+        if ($assignment) {
+            $assignment->update([
+                'returned_date' => now()
+            ]);
+        }
+
+        if ($card->subscription) {
+            $card->subscription->update([
+                'card_id' => null
+            ]);
+        }
+
+        return response()->json([
+            'message' => 'Card returned successfully'
+        ]);
+    }
 }

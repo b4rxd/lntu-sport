@@ -134,10 +134,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 html += `
                     <div class="info-block">
                         <h5>Підписка</h5>
+                         ${s.product ? `<p><strong>Продукт:</strong> ${s.product.title}</p>` : ''}
                         <p><strong>Дійсна до:</strong> ${formatDate(s.end_date)}</p>
-                        ${s.product ? `<p><strong>Продукт:</strong> ${s.product.title}</p>` : ''}
                         ${s.price ? `<p><strong>Ціна:</strong> ${s.price.amount_in_uah} грн (${s.price.title})</p>` : ''}
                         ${s.last_payment ? `<p><strong>Остання оплата:</strong> ${s.last_payment.paid_amount} грн, ${formatDate(s.last_payment.paid_at)}</p>` : '<p><em>Оплат ще не було</em></p>'}
+                        <p><strong>Кількість використань:</strong> ${s.product.infinite ? "нескінченна" : s.count_usage}</p>
                     </div>
                 `;
             }
@@ -194,6 +195,64 @@ document.addEventListener('DOMContentLoaded', function () {
                 })
                 .catch(() => showToast('Сталася помилка при створенні візиту.', 'danger'));
             };
+
+            document.getElementById('returnCardBtn').onclick = function () {
+                if (!confirm('Повернути картку?')) return;
+
+                fetch(`/card/${data.id}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': token
+                    },
+                    body: JSON.stringify({})
+                })
+                .then(async res => {
+                    const result = await res.json();
+
+                    if (res.ok && result.success) {
+                        showToast('Картку повернено!', 'success');
+                        cardModal.hide();
+                    } else {
+                        showToast(result.message ?? 'Помилка при поверненні картки', 'danger');
+                    }
+                })
+                .catch(() => showToast('Сталася помилка при поверненні картки.', 'danger'));
+            };
+
+            document.getElementById('renewSubscriptionBtn').onclick = function () {
+                if (!confirm('Продовжити абонемент?')) return;
+
+                const cardId = data.id;
+
+                if (!cardId) {
+                    showToast('Не знайдено картку', 'danger');
+                    return;
+                }
+
+                fetch(`/subscription/prolong/${cardId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': token
+                    },
+                    credentials: 'same-origin',
+                    body: JSON.stringify({})
+                })
+                .then(async res => {
+                    const result = await res.json();
+
+                    if (res.ok) {
+                        showToast('Абонемент продовжено успішно!', 'success');
+                        cardModal.hide();
+                    } else {
+                        showToast(result.message ?? 'Помилка під час продовження абонементу.', 'danger');
+                    }
+                })
+                .catch(() => showToast('Сталася помилка.', 'danger'));
+            };
+
+
         })
         .catch(() => {
             showToast('Карту не знайдено або сталася помилка.', 'warning');

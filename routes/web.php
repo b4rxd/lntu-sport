@@ -42,6 +42,8 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/subscription/create/{id}', [SubscriptionController::class, 'create'])->name('subscription.create');
     Route::post('/subscription/create', [SubscriptionController::class, 'store'])->name('subscription.store');
+    Route::post('/subscription/prolong/{id}', [SubscriptionController::class, 'prolongation'])->name('subscription.prolong');
+
 
     Route::get('/reversal', [ReversalController::class, 'index'])->name('reversal.index');
     Route::get('/reversal/create', [ReversalController::class, 'create'])->name('reversal.create');
@@ -63,6 +65,8 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/visit', [VisitController::class, 'index'])->name('visit.index');
     Route::post('/visit', [VisitController::class, 'store'])->name('visit.store');
+
+    Route::patch('/card/{id}', [CardController::class, 'returnCard'])->name('card.return');
 });
 
 Route::get('/card/info', [CardController::class, 'info'])->name('card.info');

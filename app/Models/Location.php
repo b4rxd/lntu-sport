@@ -17,6 +17,11 @@ class Location extends Model
     protected $fillable = [
         'title',
         'description',
+        'enabled'
+    ];
+
+    protected $casts = [
+        'enabled' => 'boolean'
     ];
 
     public function regularSchedulers()

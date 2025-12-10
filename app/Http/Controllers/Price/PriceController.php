@@ -26,7 +26,8 @@ class PriceController extends Controller
 
     public function destroy(Request $request, $id){
         $price = Price::findOrFail($id);
-        $price->delete();
+        $price->enabled = false;
+        $price->save();
 
         return redirect()->back()->with('success', 'Success, price deleted!');
     }

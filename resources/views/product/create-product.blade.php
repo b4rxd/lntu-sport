@@ -18,7 +18,6 @@
                 <input type="text" name="title" class="form-control" required>
             </div>
 
-            <input type="hidden" name="count_usage" value="0">
 
             <div class="mb-3">
                 <label class="form-label">Кількість використань</label>

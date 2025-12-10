@@ -17,7 +17,12 @@ class Price extends Model
     protected $fillable = [
         'title',
         'product_id',
-        'amount_in_uah'
+        'amount_in_uah',
+        'enabled'
+    ];
+
+    protected $casts = [
+        'enabled' => 'boolean'
     ];
 
     public function product()

@@ -12,6 +12,7 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->string('title');
             $table->longText('description');
+            $table->boolean('enabled')->default(true);
             $table->timestamps();
         });
 

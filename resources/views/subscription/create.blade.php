@@ -39,7 +39,6 @@
         <form action="{{ route('subscription.store') }}" method="POST" id="subscriptionForm">
             @csrf
 
-            {{-- Вибір прайсу --}}
             <div class="mb-3">
                 <label for="price_id" class="form-label">Оберіть прайс</label>
                 <select class="form-select" id="price_id" name="price_id" required>
@@ -50,7 +49,6 @@
                 </select>
             </div>
 
-            {{-- Пошук клієнта --}}
             <h5 class="mt-4">Клієнт</h5>
             <div class="mb-3 position-relative">
                 <label for="client_search" class="form-label">Пошук клієнта (за ім’ям або телефоном)</label>
@@ -58,12 +56,10 @@
                 <div id="client_results" class="list-group position-absolute w-100"></div>
             </div>
 
-            {{-- Вибраний клієнт --}}
             <div id="client_selected"></div>
 
             <input type="hidden" name="client_id" id="client_id">
 
-            {{-- Якщо новий клієнт --}}
             <hr>
             <h5 class="mt-4">Особиста інформація клієнта</h5>
 
@@ -82,7 +78,6 @@
                 <input type="tel" name="phone" id="phone" class="form-control" placeholder="+380...">
             </div>
 
-            {{-- Штрих-код --}}
             <div class="mb-3 mt-3">
                 <label class="form-label">Зіскануйте штрих-код</label>
                 <input type="text" name="barcode" class="form-control" required>

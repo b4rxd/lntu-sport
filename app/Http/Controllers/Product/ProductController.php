@@ -9,9 +9,15 @@ use App\Models\Location;
 class ProductController extends Controller
 {
     public function index(){
-        $products = Product::with('prices')->get();
+        $products = Product::where('enabled', true)
+            ->with(['prices' => function ($q) {
+                $q->where('enabled', true);
+            }])
+            ->get();
+
         return view('product.product-list', compact('products'));
     }
+
 
 
     public function create(){
@@ -20,12 +26,12 @@ class ProductController extends Controller
     }
 
     public function store(Request $request){    
-       $validated = $request->validate([
+        $validated = $request->validate([
             'title' => 'required|string|max:255',
             'type' => 'required|in:one_time,monthly,yearly',
             'description' => 'required|string',
-            'infinite' => 'sometimes|boolean',
-            'count_usage' => 'required_if:infinite,0|integer|min:1|nullable',
+            'infinite' => 'boolean',
+            'count_usage' => 'required_without:infinite|integer|min:1|nullable',
             'locations' => 'nullable|array',
             'locations.*' => 'exists:locations,id',
         ]);
@@ -38,6 +44,7 @@ class ProductController extends Controller
             'description' => $validated['description'],
         ]);
 
+
         if (!empty($validated['locations'])) {
             $product->locations()->sync($validated['locations']);
         }
@@ -48,7 +55,8 @@ class ProductController extends Controller
 
     public function destroy(Request $request, $id){
         $product = Product::findOrFail($id);
-        $product->delete();
+        $product->enabled = false;
+        $product->save();
 
         return redirect()->route('products.index')->with('success', 'Success product destroy!');
     }
