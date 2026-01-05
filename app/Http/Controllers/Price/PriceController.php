@@ -31,6 +31,12 @@ class PriceController extends Controller
     }
 
     public function destroy(Request $request, $id){
+        $user = auth()->user();
+
+        if (!$user || !$user->isAdmin()) {
+            abort(403, 'У вас немає доступу для видалення');
+        }
+
         $price = Price::findOrFail($id);
         $price->enabled = false;
         $price->save();

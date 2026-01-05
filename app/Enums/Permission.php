@@ -9,4 +9,5 @@ enum Permission: string
     case CREATE_LOCATION = 'create_location';
     case EDIT_LOCATION = 'edit_location';
     case CREATE_RETURN = 'create_return';
+    case CREATE_PROLONGATION = 'create_prolongation';
 }

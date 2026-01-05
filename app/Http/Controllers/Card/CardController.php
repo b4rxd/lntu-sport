@@ -116,6 +116,12 @@ class CardController extends Controller
     }
 
     public function returnCard(Request $request, $id){
+        $user = auth()->user();
+
+        if (!$user || !$user->hasPermission(\App\Enums\Permission::CREATE_RETURN)) {
+            abort(403, 'У вас немає доступу для поверення картки');
+        }
+        
         $card = Card::where('id', $id)->with([
             'cardAssignments' => function ($query) {
                 $query->whereNull('returned_date')->limit(1);

@@ -58,6 +58,12 @@ class ProductController extends Controller
 
 
     public function destroy(Request $request, $id){
+        $user = auth()->user();
+
+        if (!$user || !$user->isAdmin()) {
+            abort(403, 'У вас немає доступу для видалення');
+        }
+        
         $product = Product::findOrFail($id);
         $product->enabled = false;
         $product->save();

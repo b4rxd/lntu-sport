@@ -18,6 +18,12 @@ class ReversalController extends Controller
     }
 
     public function store(Request $request){
+        $user = auth()->user();
+
+        if (!$user || !$user->hasPermission(\App\Enums\Permission::CREATE_RETURN)) {
+            abort(403, 'У вас немає доступу для створення поверення');
+        }
+
         $credentials = $request->validate([
             'cardId' => 'required|exists:cards,id',
             'amount_in_uah' => 'required|numeric|min:1'

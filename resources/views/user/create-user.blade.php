@@ -56,6 +56,11 @@
                     <input class="form-check-input" type="checkbox" name="permissions[]" value="create_return" id="create_return">
                     <label class="form-check-label" for="create_return">Створення повернень</label>
                 </div>
+
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="permissions[]" value="create_return" id="create_return">
+                    <label class="form-check-label" for="create_prolongation">Створення продовжень</label>
+                </div>
             </div>
 
             <button type="submit" class="btn btn-primary w-100">Створити користувача</button>

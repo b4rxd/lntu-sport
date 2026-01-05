@@ -16,6 +16,12 @@ class LocationController extends Controller
     }
 
     public function create(){
+        $user = auth()->user();
+
+        if (!$user || !$user->hasPermission(\App\Enums\Permission::CREATE_LOCATION)) {
+            return redirect('/card/info');
+        }
+
         return view('location.create-location');
     }
 
@@ -23,7 +29,7 @@ class LocationController extends Controller
         $user = auth()->user();
 
         if (!$user || !$user->hasPermission(\App\Enums\Permission::CREATE_LOCATION)) {
-            abort(403, 'У вас немає доступу для створення продукту');
+            abort(403, 'У вас немає доступу для створення локації');
         }
 
         $validated = $request->validated();
@@ -48,6 +54,12 @@ class LocationController extends Controller
     }
 
     public function edit($id){
+        $user = auth()->user();
+
+        if (!$user || !$user->hasPermission(\App\Enums\Permission::EDIT_LOCATION)) {
+            return redirect('/card/info');
+        }
+
         $location = Location::with(['regularSchedulers'])
             ->findOrFail($id);
 
@@ -64,6 +76,12 @@ class LocationController extends Controller
 
 
     public function update(StoreLocationRequest $request, $id){
+        $user = auth()->user();
+
+        if (!$user || !$user->hasPermission(\App\Enums\Permission::EDIT_LOCATION)) {
+            abort(403, 'У вас немає доступу для редагування локації');
+        }
+
         $validated = $request->validated();
 
         $location = Location::findOrFail($id);

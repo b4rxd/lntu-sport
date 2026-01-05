@@ -18,7 +18,7 @@ Route::get('/', [WelcomeController::class, 'index'])->name('welcome');
 
 Route::get('/login', [AuthController::class, 'login'])->name('login');
 
-Route::post('/postLogin', [AuthController::class, 'postLogin'])->name('post-login');
+    Route::post('/postLogin', [AuthController::class, 'postLogin'])->name('post-login');
 
 Route::post('/card/{barcode}', [CardController::class, 'search'])
     ->name('public.card.search');

@@ -4,12 +4,15 @@
     <link href="{{ asset('resources/css/survey.css') }}" rel="stylesheet">
 @endpush
 
-@section('content')
+@section('content') 
 <div class="container mt-4">
     <h1 class="mb-4 text-center">Список продуктів</h1>
     <div class="text-end mt-3 mb-3">
-        <a href="{{ route('products.create') }}" class="btn btn-success">Створити продукт</a>
+        @if(auth()->user()->hasPermission(\App\Enums\Permission::CREATE_PRODUCT))
+            <a href="{{ route('products.create') }}" class="btn btn-success">Створити продукт</a>
+        @endif
     </div>
+
 
     @php
         $types = [
@@ -45,11 +48,14 @@
                                         <li class="list-group-item d-flex justify-content-between align-items-center">
                                             {{ $price->title }} — {{ $price->amount_in_uah }} ₴
 
-                                            <form action="{{ route('prices.destroy', $price->id) }}" method="POST" class="ms-3">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="btn btn-danger btn-sm w-100">Видалити</button>
-                                            </form>
+                                            @if(auth()->user()->isAdmin())
+                                                <form action="{{ route('prices.destroy', $price->id) }}" method="POST" class="ms-3">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="btn btn-danger btn-sm w-100">Видалити</button>
+                                                </form>
+                                            @endif
+
                                         </li>
                                     @endforeach
                                 </ul>
@@ -58,17 +64,20 @@
                             @endif
 
                             <div class="mt-auto">
-                                <button class="btn btn-primary w-100 mb-2" data-bs-toggle="modal" data-bs-target="#priceModal-{{ $product->id }}">
-                                    Створити ціну
-                                </button>
+                                @if(auth()->user()->hasPermission(\App\Enums\Permission::CREATE_PRODUCT))
+                                    <button class="btn btn-primary w-100 mb-2" data-bs-toggle="modal" data-bs-target="#priceModal-{{ $product->id }}">
+                                        Створити ціну
+                                    </button>
+                                @endif
 
                                 <a href="{{ route('subscription.create', $product->id) }}" class="btn btn-success w-100 mb-2">Продати</a>
-
-                                <form class="w-100" action="{{ route('products.destroy', $product->id) }}" method="POST" onsubmit="return confirm('Точно видалити?');">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-danger btn-sm w-100">Видалити</button>
-                                </form>
+                                @if(auth()->user()->isAdmin())
+                                    <form class="w-100" action="{{ route('products.destroy', $product->id) }}" method="POST" onsubmit="return confirm('Точно видалити?');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-danger btn-sm w-100">Видалити</button>
+                                    </form>
+                                @endif
                             </div>
                         </div>
                     </div>

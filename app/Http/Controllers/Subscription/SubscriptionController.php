@@ -18,6 +18,12 @@ use Illuminate\Http\Request;
 
 class SubscriptionController extends Controller{
     public function create(Request $request, $id){
+        $user = auth()->user();
+
+        if (!$user || !$user->hasPermission(\App\Enums\Permission::SELL)) {
+            return redirect('/card/info');
+        }
+
         $product = Product::with('prices')->where('id', $id)->firstOrFail();
         
         return view('subscription.create', compact('product'));
@@ -27,7 +33,7 @@ class SubscriptionController extends Controller{
         $user = auth()->user();
 
         if (!$user || !$user->hasPermission(\App\Enums\Permission::SELL)) {
-            abort(403, 'У вас немає доступу для створення продукту');
+            abort(403, 'У вас немає доступу для продажу');
         }
 
         $validated = $request->validate([

@@ -34,12 +34,15 @@
         <h5 class="modal-title">Інформація про карту</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрити"></button>
       </div>
-      <div class="modal-body" id="cardModalBody"></div>
+      <div class="modal-body" id="cardModalBody"
+           data-can-enter="@json(auth()->user()->hasPermission(\App\Enums\Permission::SELL))"
+           data-can-return="@json(auth()->user()->isAdmin())"
+           data-can-prolong="@json(auth()->user()->hasPermission(\App\Enums\Permission::CREATE_PROLONGATION))">
+      </div>
     </div>
   </div>
 </div>
 
-{{-- Toast container --}}
 <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 9999">
     <div id="toastMessage" class="toast align-items-center text-bg-primary border-0" role="alert">
         <div class="d-flex">
@@ -48,7 +51,6 @@
         </div>
     </div>
 </div>
-
 @endsection
 
 @push('scripts')
@@ -58,14 +60,11 @@ document.addEventListener('DOMContentLoaded', function () {
     const modalEl = document.getElementById('cardModal');
     const cardModal = new bootstrap.Modal(modalEl);
 
-    // Toast function
     function showToast(message, type = 'primary') {
         const toastEl = document.getElementById('toastMessage');
         const toastBody = document.getElementById('toastBody');
-
         toastBody.textContent = message;
         toastEl.className = `toast align-items-center text-bg-${type} border-0`;
-
         const toast = new bootstrap.Toast(toastEl, { delay: 3000 });
         toast.show();
     }
@@ -84,7 +83,6 @@ document.addEventListener('DOMContentLoaded', function () {
         e.preventDefault();
         const barcode = document.getElementById('barcodeInput').value.trim();
         const token = document.querySelector('input[name="_token"]').value;
-
         if (!barcode) return;
 
         fetch(`/card/info/${barcode}`, {
@@ -95,15 +93,17 @@ document.addEventListener('DOMContentLoaded', function () {
             },
             body: JSON.stringify({})
         })
-        .then(res => {
-            if (!res.ok) throw new Error();
-            return res.json();
-        })
+        .then(res => res.ok ? res.json() : Promise.reject())
         .then(data => {
             if (!data || !data.id) {
                 showToast('Карту не знайдено', 'warning');
                 return;
             }
+
+            const modalBody = document.getElementById('cardModalBody');
+            const canEnter = modalBody.dataset.canEnter === "true";
+            const canReturn = modalBody.dataset.canReturn === "true";
+            const canProlong = modalBody.dataset.canProlong === "true";
 
             let html = `
                 <div class="info-block">
@@ -134,7 +134,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 html += `
                     <div class="info-block">
                         <h5>Підписка</h5>
-                         ${s.product ? `<p><strong>Продукт:</strong> ${s.product.title}</p>` : ''}
+                        ${s.product ? `<p><strong>Продукт:</strong> ${s.product.title}</p>` : ''}
                         <p><strong>Дійсна до:</strong> ${formatDate(s.end_date)}</p>
                         ${s.price ? `<p><strong>Ціна:</strong> ${s.price.amount_in_uah} грн (${s.price.title})</p>` : ''}
                         ${s.last_payment ? `<p><strong>Остання оплата:</strong> ${s.last_payment.paid_amount} грн, ${formatDate(s.last_payment.paid_at)}</p>` : '<p><em>Оплат ще не було</em></p>'}
@@ -153,105 +153,104 @@ document.addEventListener('DOMContentLoaded', function () {
                 html += `</ul></div>`;
             }
 
-            html += `
-                <div class="d-flex mt-3" style="gap: 10px;">
-                    <button type="button" class="btn btn-success" id="enterCardBtn">Вхід</button>
-                    <button type="button" class="btn btn-warning" id="returnCardBtn">Повернути картку</button>
-                    <button type="button" class="btn btn-primary" id="renewSubscriptionBtn">Продовжити абонемент</button>
-                </div>
-            `;
+            html += `<div class="d-flex mt-3" style="gap: 10px;">`;
 
-            document.getElementById('cardModalBody').innerHTML = html;
+            if (canEnter) {
+                html += `<button type="button" class="btn btn-success" id="enterCardBtn">Вхід</button>`;
+            }
+
+            if (canReturn) {
+                html += `<button type="button" class="btn btn-warning" id="returnCardBtn">Повернути картку</button>`;
+            }
+
+            if (canProlong) {
+                html += `<button type="button" class="btn btn-primary" id="renewSubscriptionBtn">Продовжити абонемент</button>`;
+            }
+
+            html += `</div>`;
+
+            modalBody.innerHTML = html;
             cardModal.show();
 
-            document.getElementById('enterCardBtn').onclick = function() {
-                if (!confirm('Підтвердити вхід?')) return;
+            if (canEnter) {
+                document.getElementById('enterCardBtn').onclick = function() {
+                    if (!confirm('Підтвердити вхід?')) return;
+                    const subscriptionId = data.subscription?.id;
+                    const locationId = data.locations && data.locations.length > 0 ? data.locations[0].id : null;
 
-                const subscriptionId = data.subscription?.id;
-                const locationId = data.locations && data.locations.length > 0 ? data.locations[0].id : null;
-
-                if (!subscriptionId || !locationId) {
-                    showToast('Неможливо зафіксувати візит: відсутня підписка або локація', 'danger');
-                    return;
-                }
-
-                fetch('/visit', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': token
-                    },
-                    body: JSON.stringify({ subscription_id: subscriptionId, location_id: locationId })
-                })
-                .then(async res => {
-                    const data = await res.json();
-
-                    if (res.ok && data.success) {
-                        showToast('Візит зафіксовано!', 'success');
-                        cardModal.hide();
-                    } else {
-                        showToast(data.message ?? 'Сталася помилка при створенні візиту.', 'danger');
+                    if (!subscriptionId || !locationId) {
+                        showToast('Неможливо зафіксувати візит: відсутня підписка або локація', 'danger');
+                        return;
                     }
-                })
-                .catch(() => showToast('Сталася помилка при створенні візиту.', 'danger'));
-            };
 
-            document.getElementById('returnCardBtn').onclick = function () {
-                if (!confirm('Повернути картку?')) return;
+                    fetch('/visit', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': token
+                        },
+                        body: JSON.stringify({ subscription_id: subscriptionId, location_id: locationId })
+                    })
+                    .then(async res => {
+                        const data = await res.json();
+                        if (res.ok && data.success) {
+                            showToast('Візит зафіксовано!', 'success');
+                            cardModal.hide();
+                        } else {
+                            showToast(data.message ?? 'Сталася помилка при створенні візиту.', 'danger');
+                        }
+                    })
+                    .catch(() => showToast('Сталася помилка при створенні візиту.', 'danger'));
+                };
+            }
 
-                fetch(`/card/${data.id}`, {
-                    method: 'PATCH',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': token
-                    },
-                    body: JSON.stringify({})
-                })
-                .then(async res => {
-                    const result = await res.json();
+            if (canReturn) {
+                document.getElementById('returnCardBtn').onclick = function () {
+                    if (!confirm('Повернути картку?')) return;
+                    fetch(`/card/${data.id}`, {
+                        method: 'PATCH',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': token
+                        },
+                        body: JSON.stringify({})
+                    })
+                    .then(async res => {
+                        const result = await res.json();
+                        if (res.ok && result.success) {
+                            showToast('Картку повернено!', 'success');
+                            cardModal.hide();
+                        } else {
+                            showToast(result.message ?? 'Помилка при поверненні картки', 'danger');
+                        }
+                    })
+                    .catch(() => showToast('Сталася помилка при поверненні картки.', 'danger'));
+                };
+            }
 
-                    if (res.ok && result.success) {
-                        showToast('Картку повернено!', 'success');
-                        cardModal.hide();
-                    } else {
-                        showToast(result.message ?? 'Помилка при поверненні картки', 'danger');
-                    }
-                })
-                .catch(() => showToast('Сталася помилка при поверненні картки.', 'danger'));
-            };
-
-            document.getElementById('renewSubscriptionBtn').onclick = function () {
-                if (!confirm('Продовжити абонемент?')) return;
-
-                const cardId = data.id;
-
-                if (!cardId) {
-                    showToast('Не знайдено картку', 'danger');
-                    return;
-                }
-
-                fetch(`/subscription/prolong/${cardId}`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': token
-                    },
-                    credentials: 'same-origin',
-                    body: JSON.stringify({})
-                })
-                .then(async res => {
-                    const result = await res.json();
-
-                    if (res.ok) {
-                        showToast('Абонемент продовжено успішно!', 'success');
-                        cardModal.hide();
-                    } else {
-                        showToast(result.message ?? 'Помилка під час продовження абонементу.', 'danger');
-                    }
-                })
-                .catch(() => showToast('Сталася помилка.', 'danger'));
-            };
-
+            if (canProlong) {
+                document.getElementById('renewSubscriptionBtn').onclick = function () {
+                    if (!confirm('Продовжити абонемент?')) return;
+                    fetch(`/subscription/prolong/${data.id}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': token
+                        },
+                        body: JSON.stringify({})
+                    })
+                    .then(async res => {
+                        const result = await res.json();
+                        if (res.ok) {
+                            showToast('Абонемент продовжено успішно!', 'success');
+                            cardModal.hide();
+                        } else {
+                            showToast(result.message ?? 'Помилка під час продовження абонементу.', 'danger');
+                        }
+                    })
+                    .catch(() => showToast('Сталася помилка.', 'danger'));
+                };
+            }
 
         })
         .catch(() => {

@@ -75,7 +75,9 @@
                                 <li><a class="dropdown-item" href="{{ route('report.sale.index') }}">Продажі</a></li>
                             </ul>
                         </div>
-                        <a class="dropdown-item" href="{{ route('user.index') }}">Користувачі</a>
+                        @if(auth()->user()->isAdmin())
+                            <a class="dropdown-item" href="{{ route('user.index') }}">Користувачі</a>
+                        @endif        
                     @endauth
                 </nav>
 

@@ -7,9 +7,12 @@
 @section('content')
 <div class="container mt-4">
     <h1 class="mb-4 text-center">Список локацій</h1>
-    <div class="text-end mt-3 mb-3">
-        <a href="{{ route('locations.create') }}" class="btn btn-success">Додати нову локацію</a>
-    </div>
+
+    @if(auth()->user()->hasPermission(\App\Enums\Permission::CREATE_LOCATION))
+        <div class="text-end mt-3 mb-3">
+            <a href="{{ route('locations.create') }}" class="btn btn-success">Додати нову локацію</a>
+        </div>
+    @endif
 
     @forelse($locations as $location)
         @php
@@ -24,16 +27,20 @@
                     <p>{{ $location->description }}</p>
 
                     <div class="d-flex gap-2 flex-wrap mt-2">
-                        <a href="{{ route('locations.edit', $location->id) }}" class="btn btn-primary btn-sm w-100">
-                            Редагувати
-                        </a>
+                        @if(auth()->user()->hasPermission(\App\Enums\Permission::EDIT_LOCATION))
+                            <a href="{{ route('locations.edit', $location->id) }}" class="btn btn-primary btn-sm w-100">
+                                Редагувати
+                            </a>
+                        @endif
 
-                        <form class="w-100" action="{{ route('locations.destroy', $location->id) }}" method="POST"
-                              onsubmit="return confirm('Точно видалити?');">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn btn-danger btn-sm w-100">Видалити</button>
-                        </form>
+                        @if(auth()->user()->isAdmin())
+                            <form class="w-100" action="{{ route('locations.destroy', $location->id) }}" method="POST"
+                                  onsubmit="return confirm('Точно видалити?');">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-danger btn-sm w-100">Видалити</button>
+                            </form>
+                        @endif
                     </div>
                 </div>
 
@@ -41,24 +48,21 @@
                     <div class="mb-3">
                         <h5>Графік роботи</h5>
                         <ul class="mb-0">
-
                             @for($i = 1; $i <= 7; $i++)
                                 <li>
                                     <strong>{{ $days[$i-1] }}:</strong>
 
                                     @if(isset($regularByDay[$i]))
-                                      @foreach($regularByDay[$i] as $r)
-                                        {{ \Carbon\Carbon::parse($r->time_from)->format('H:i') }}
-                                        –
-                                        {{ \Carbon\Carbon::parse($r->time_till)->format('H:i') }}
-                                    @endforeach
-
+                                        @foreach($regularByDay[$i] as $r)
+                                            {{ \Carbon\Carbon::parse($r->time_from)->format('H:i') }}
+                                            –
+                                            {{ \Carbon\Carbon::parse($r->time_till)->format('H:i') }}
+                                        @endforeach
                                     @else
                                         вихідний
                                     @endif
                                 </li>
                             @endfor
-
                         </ul>
                     </div>
                 </div>
