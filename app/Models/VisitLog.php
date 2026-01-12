@@ -19,6 +19,7 @@ class VisitLog extends Model
         'location_id',
         'type' => VisitLogType::class,
         'paid_amount',
+        'created_by_id'
     ];
 
     public function subscription(){

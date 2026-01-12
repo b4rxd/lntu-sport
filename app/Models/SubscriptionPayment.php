@@ -16,7 +16,8 @@ class SubscriptionPayment extends Model
     protected $fillable = [
         'subscription_id',
         'price_id',
-        'paid_amount'
+        'paid_amount',
+        'created_by_id'
     ];
 
     protected $casts = [

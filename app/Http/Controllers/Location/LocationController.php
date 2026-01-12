@@ -35,6 +35,7 @@ class LocationController extends Controller
         $validated = $request->validated();
 
         $location = Location::create([
+            
             'title' => $validated['title'],
             'description' => $validated['description']
         ]);

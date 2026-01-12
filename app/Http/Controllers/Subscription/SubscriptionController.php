@@ -76,7 +76,7 @@ class SubscriptionController extends Controller{
             'client_id' => $client->id,
             'card_id' => $card->id,
             'price_id' => $price->id,
-            'created_by_id' => Auth::user()->id,
+            'created_by_id' => Auth::id(),
             'end_date' => $endDate,
             'count_usage' => $product->count_usage,
             'status' => SubscriptionStatus::ACTIVE
@@ -93,10 +93,11 @@ class SubscriptionController extends Controller{
         SubscriptionPayment::create([
             'subscription_id' => $subscription->id,
             'price_id' => $price->id,
-            'paid_amount' => $price->amount_in_uah
+            'paid_amount' => $price->amount_in_uah,
+            'created_by_id' => Auth::id()
         ]);
 
-        return redirect("/")->with('success', 'Card created!');
+        return redirect("/card/info")->with('success', 'Card created!');
     }
 
     public function prolongation(Request $request, $id){

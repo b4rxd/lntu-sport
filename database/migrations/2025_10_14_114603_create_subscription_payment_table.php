@@ -16,10 +16,13 @@ return new class extends Migration
             $table->uuid('subscription_id')->nullable();
             $table->uuid('price_id')->nullable();
             $table->integer('paid_amount');
+            $table->uuid('client_id')->nullable();;
+            $table->uuid('created_by_id')->nullable();;
             $table->timestamps();
 
             $table->foreign('subscription_id')->references('id')->on('subscriptions')->onDelete('set null');
             $table->foreign('price_id')->references('id')->on('prices')->onDelete('set null');
+            $table->foreign('created_by_id')->references('id')->on('users')->onDelete('set null');
         });
     }
 
