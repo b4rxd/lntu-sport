@@ -20,8 +20,6 @@ class VisitController extends Controller
     }
 
     public function store(Request $request){
-        $this->authorize('create-visit');
-
         $request->validate([
             'subscription_id' => 'required|exists:subscriptions,id',
             'location_id' => 'required|exists:locations,id',

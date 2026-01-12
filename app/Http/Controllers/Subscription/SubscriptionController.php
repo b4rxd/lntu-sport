@@ -100,6 +100,12 @@ class SubscriptionController extends Controller{
     }
 
     public function prolongation(Request $request, $id){
+        $user = auth()->user();
+
+        if (!$user || !$user->hasPermission(\App\Enums\Permission::CREATE_PROLONGATION)) {
+            abort(403, 'У вас немає доступу для продажу');
+        }
+
         $card = Card::where('id', $id)
             ->with(['subscription.price.product'])
             ->firstOrFail();
