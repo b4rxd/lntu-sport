@@ -98,7 +98,7 @@
                 <div class="h-100 p-4 border rounded bg-light">
                     <p><strong>Адреса:</strong><br>м. Луцьк, вул. Львівська, 75</p>
                     <p><strong>Email:</strong><br>sport@lntu.edu.ua</p>
-                    <p><strong>Телефон:</strong><br>+38 (0332) 00-00-00</p>
+                    <p><strong>Телефон:</strong><br>+38</p>
                 </div>
             </div>            <div class="col-md-7">
                 <div class="h-100 rounded overflow-hidden shadow-sm">
