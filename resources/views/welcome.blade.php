@@ -90,12 +90,33 @@
 </section>
 
 <section class="py-5">
-    <div class="container text-center">
-        <h2 class="mb-4">Контакти</h2>
-        <p><strong>Адреса:</strong> м. Луцьк, вул. Львівська, 75</p>
-        <p><strong>Email:</strong> sport@lntu.edu.ua</p>
+    <div class="container">
+        <h2 class="text-center mb-4">Контакти</h2>
+
+        <div class="row g-4 align-items-stretch">
+            <div class="col-md-5">
+                <div class="h-100 p-4 border rounded bg-light">
+                    <p><strong>Адреса:</strong><br>м. Луцьк, вул. Львівська, 75</p>
+                    <p><strong>Email:</strong><br>sport@lntu.edu.ua</p>
+                    <p><strong>Телефон:</strong><br>+38 (0332) 00-00-00</p>
+                </div>
+            </div>            <div class="col-md-7">
+                <div class="h-100 rounded overflow-hidden shadow-sm">
+                    <iframe
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d14143.6017637671!2d25.31022912692364!3d50.71952543186223!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4725999f6e2df683%3A0xf91cf1fdf1ea3404!2z0KHQv9C-0YDRgtC60L7QvNC_0LvQtdC60YEg0JvQndCi0KM!5e1!3m2!1suk!2sua!4v1768481725011!5m2!1suk!2sua"
+                        width="100%"
+                        height="100%"
+                        style="border:0; min-height:300px;"
+                        allowfullscreen=""
+                        loading="lazy"
+                        referrerpolicy="no-referrer-when-downgrade">
+                    </iframe>
+                </div>
+            </div>
+        </div>
     </div>
 </section>
+
 
 <footer class="bg-dark text-white text-center py-3">Спорткомплекс ЛНТУ</footer>
 
