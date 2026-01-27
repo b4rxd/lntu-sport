@@ -15,22 +15,64 @@
 
             <div class="mb-3">
                 <label class="form-label">Email</label>
-                <input type="text" name="email" class="form-control" required>
+                <input
+                    type="password"
+                    name="email"
+                    class="form-control @error('email') is-invalid @enderror"
+                >
+
+                @error('email')
+                    <div class="invalid-feedback">
+                        {{ $message }}
+                    </div>
+                @enderror
             </div>
 
             <div class="mb-3">
                 <label class="form-label">Ім'я</label>
-                <input type="text" name="first_name" class="form-control" min="1" required>
+                <input
+                    type="text"
+                    name="first_name"
+                    class="form-control @error('first_name') is-invalid @enderror"
+                    value="{{ old('first_name') }}"
+                >
+
+                @error('first_name')
+                    <div class="invalid-feedback">
+                        {{ $message }}
+                    </div>
+                @enderror
             </div>
 
             <div class="mb-3">
                 <label class="form-label">Прізвище</label>
-                <input type="text" name="last_name" class="form-control" min="1" required>
+                <input
+                    type="text"
+                    name="last_name"
+                    class="form-control @error('last_name') is-invalid @enderror"
+                    value="{{ old('last_name') }}"
+                >
+
+                @error('last_name')
+                    <div class="invalid-feedback">
+                        {{ $message }}
+                    </div>
+                @enderror
             </div>
 
             <div class="mb-3">
                 <label class="form-label">Пароль</label>
-                <input type="password" name="password" class="form-control" min="8" required>
+                <input
+                    type="password"
+                    name="password"
+                    class="form-control @error('password') is-invalid @enderror"
+                >
+
+                @error('password')
+                    <div class="invalid-feedback">
+                        {{ $message }}
+                    </div>
+                @enderror
             </div>
 
             <h5 class="mt-4">Дозволи користувача</h5>

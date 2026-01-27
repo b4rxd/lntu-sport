@@ -27,6 +27,12 @@
         margin-top: 10px;
         display: none;
     }
+    .is-invalid {
+        border-color: #dc3545;
+    }
+    .invalid-feedback {
+        display: block;
+    }
 </style>
 @endpush
 
@@ -41,46 +47,69 @@
 
             <div class="mb-3">
                 <label for="price_id" class="form-label">Оберіть прайс</label>
-                <select class="form-select" id="price_id" name="price_id" required>
+                <select class="form-select @error('price_id') is-invalid @enderror" id="price_id" name="price_id" required>
                     <option value="" selected disabled>Оберіть прайс</option>
                     @foreach($product->prices as $price)
-                        <option value="{{ $price->id }}">{{ $price->title }}</option>
+                        <option value="{{ $price->id }}" {{ old('price_id') == $price->id ? 'selected' : '' }}>
+                            {{ $price->title }}
+                        </option>
                     @endforeach
                 </select>
+                @error('price_id')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
             </div>
 
             <h5 class="mt-4">Клієнт</h5>
             <div class="mb-3 position-relative">
                 <label for="client_search" class="form-label">Пошук клієнта (за ім’ям або телефоном)</label>
-                <input type="text" id="client_search" class="form-control" placeholder="Почніть вводити ім’я або телефон...">
+                <input type="text" id="client_search" class="form-control" placeholder="Почніть вводити ім’я або телефон..." value="{{ old('first_name') ? old('first_name').' '.old('last_name') : '' }}">
                 <div id="client_results" class="list-group position-absolute w-100"></div>
             </div>
 
-            <div id="client_selected"></div>
+            <div id="client_selected">
+                @if(old('client_id'))
+                    <strong>✅ Вибраний клієнт:</strong><br>
+                    {{ old('first_name') }} {{ old('last_name') }}<br>
+                    <small>{{ old('phone') }}</small>
+                @endif
+            </div>
 
-            <input type="hidden" name="client_id" id="client_id">
+            <input type="hidden" name="client_id" id="client_id" value="{{ old('client_id') }}">
 
             <hr>
             <h5 class="mt-4">Особиста інформація клієнта</h5>
 
             <div class="mb-3">
                 <label for="first_name" class="form-label">Ім’я</label>
-                <input type="text" name="first_name" id="first_name" class="form-control">
+                <input type="text" name="first_name" id="first_name" class="form-control @error('first_name') is-invalid @enderror" value="{{ old('first_name') }}" required>
+                @error('first_name')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
             </div>
 
             <div class="mb-3">
                 <label for="last_name" class="form-label">Прізвище</label>
-                <input type="text" name="last_name" id="last_name" class="form-control">
+                <input type="text" name="last_name" id="last_name" class="form-control @error('last_name') is-invalid @enderror" value="{{ old('last_name') }}" required>
+                @error('last_name')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
             </div>
 
             <div class="mb-3">
                 <label for="phone" class="form-label">Телефон</label>
-                <input type="tel" name="phone" id="phone" class="form-control" placeholder="+380...">
+                <input type="tel" name="phone" id="phone" class="form-control @error('phone') is-invalid @enderror" value="{{ old('phone') }}" placeholder="+380..." required>
+                @error('phone')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
             </div>
 
             <div class="mb-3 mt-3">
                 <label class="form-label">Зіскануйте штрих-код</label>
-                <input type="text" name="barcode" class="form-control" required>
+                <input type="text" name="barcode" class="form-control @error('barcode') is-invalid @enderror" value="{{ old('barcode') }}" required>
+                @error('barcode')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
             </div>
 
             <button type="submit" class="btn btn-primary w-100 mt-3">Сформувати вхідний документ</button>
