@@ -31,12 +31,18 @@
                             <td>{{ $user->id }}</td>
                             <td>{{ $user->first_name ?? '—' }}</td>
                             <td>{{ $user->last_name ?? '—' }}</td>
-                            <td>{{ $user->email }}</td>                            <td class="text-center">
+                            <td>{{ $user->email }}</td>                            
+                            <td class="text-center">
+                                <a href="{{ route('user.edit', $user->id) }}" class="btn btn-sm btn-outline-primary me-1">
+                                    Редагувати
+                                </a>
+
                                 <form action="{{ route('user.toggle', $user->id) }}" method="POST" class="d-inline">
                                     @csrf
                                     @method('PATCH')
-                                    <button type="submit" 
-                                            class="btn btn-sm {{ $user->enabled ? 'btn-outline-danger' : 'btn-outline-success' }}">
+                                    <button
+                                        type="submit"
+                                        class="btn btn-sm {{ $user->enabled ? 'btn-outline-danger' : 'btn-outline-success' }}">
                                         Видалити
                                     </button>
                                 </form>

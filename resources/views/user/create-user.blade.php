@@ -16,7 +16,7 @@
             <div class="mb-3">
                 <label class="form-label">Email</label>
                 <input
-                    type="password"
+                    type="text"
                     name="email"
                     class="form-control @error('email') is-invalid @enderror"
                 >
@@ -78,7 +78,7 @@
             <h5 class="mt-4">Дозволи користувача</h5>
 
             <div class="mb-3">
-                 <div class="form-check">
+                <div class="form-check">
                     <input class="form-check-input" type="checkbox" name="permissions[]" value="sell" id="sell">
                     <label class="form-check-label" for="sell">Продаж</label>
                 </div>
@@ -100,7 +100,7 @@
                 </div>
 
                 <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="permissions[]" value="create_return" id="create_return">
+                    <input class="form-check-input" type="checkbox" name="permissions[]" value="create_prolongation" id="create_return">
                     <label class="form-check-label" for="create_prolongation">Створення продовжень</label>
                 </div>
             </div>

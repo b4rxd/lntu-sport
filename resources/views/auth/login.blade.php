@@ -2,6 +2,14 @@
 
 @push('styles')
     <link href="{{ asset('resources/css/survey.css') }}" rel="stylesheet">
+    <style>
+        .is-invalid {
+            border-color: #dc3545;
+        }
+        .invalid-feedback {
+            display: block;
+        }
+    </style>
 @endpush
 
 @section('content')
@@ -14,12 +22,33 @@
             
             <div class="mb-3">
                 <label for="email" class="form-label">Електронна пошта</label>
-                <input type="text" class="form-control" id="email" name="email" placeholder="Введіть електронну пошту" required>
+                <input 
+                    type="email"
+                    class="form-control @error('email') is-invalid @enderror"
+                    id="email"
+                    name="email"
+                    value="{{ old('email') }}"
+                    placeholder="Введіть електронну пошту"
+                    required
+                >
+                @error('email')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
             </div>
             
             <div class="mb-3">
                 <label for="password" class="form-label">Пароль</label>
-                <input type="password" class="form-control" id="password" name="password" placeholder="Введіть пароль" required>
+                <input 
+                    type="password"
+                    class="form-control @error('password') is-invalid @enderror"
+                    id="password"
+                    name="password"
+                    placeholder="Введіть пароль"
+                    required
+                >
+                @error('password')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
             </div>
             
             <div class="d-grid">

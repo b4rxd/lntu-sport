@@ -15,22 +15,30 @@ class AuthController extends Controller
         return view('auth.login');
     }
 
-    public function postLogin(Request $request){
-        $credentials = $request->validate([
+    public function postLogin(Request $request)
+    {
+        $request->validate([
             'email' => ['required', 'email'],
             'password' => ['required'],
         ]);
 
-        if(Auth::attempt(['email' => $credentials['email'], 'password' => $credentials['password'], 'enabled' => true])){
-            $request->session()->regenerate();
-
-            return redirect()->intended('/card/info');
+        if (!Auth::attempt([
+            'email' => $request->email,
+            'password' => $request->password,
+            'enabled' => true,
+        ])) {
+            return back()
+                ->withErrors([
+                    'email' => __('Невірний email або пароль'),
+                ])
+                ->withInput($request->only('email'));
         }
 
-        return back()->withErrors([
-             'email' => 'Invalid email or password.',
-        ])->withInput($request->only('email'));
+        $request->session()->regenerate();
+
+        return redirect()->intended('/card/info');
     }
+
 
     public function postLogout(Request $request){
         Auth::logout();

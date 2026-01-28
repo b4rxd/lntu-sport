@@ -58,6 +58,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/user/create-user', [UserController::class, 'storeUser'])->name('user.storeUser');
     Route::post('/user/store-admin', [UserController::class, 'storeAdmin'])->name('user.storeAdmin');
     Route::patch('/user/toggle/{id}', [UserController::class, 'toggle'])->name('user.toggle');
+    Route::get('/users/{id}/edit', [UserController::class, 'edit'])->name('user.edit');
+    Route::put('/users/{id}', [UserController::class, 'update'])->name('user.update');
 
     
     Route::get('/clients', [ClientController::class, 'index'])->name('client.index');

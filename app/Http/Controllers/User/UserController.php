@@ -94,18 +94,71 @@ class UserController extends Controller
     }
 
     public function toggle(Request $request, $id){
-        $user = auth()->user();
+        $authUser = auth()->user();
 
-        if (!$user || !$user->isAdmin()) {
+        if (!$authUser || !$authUser->isAdmin()) {
             return redirect('card/info');
         }
-        
+
+        if ($authUser->id == $id) {
+            return redirect()->back()->with('error', 'Ви не можете видалити власний акаунт');
+        }
+
         $user = User::findOrFail($id);
 
         $user->update([
             'enabled' => !$user->enabled
         ]);
 
-        return redirect()->back()->with('success', 'Success user toggle!');
+        return redirect()->back()->with('success', 'Статус користувача змінено');
+    }
+
+
+    public function edit($id){
+        $user = auth()->user();
+
+        if (!$user || !$user->isAdmin()) {
+            return redirect('card/info');
+        }
+
+        $editUser = User::findOrFail($id);
+
+        return view('user.edit-user', compact('editUser'));
+    }
+
+    public function update(Request $request, $id){
+        $user = auth()->user();
+
+        if (!$user || !$user->isAdmin()) {
+            return redirect('card/info');
+        }
+
+        $editUser = User::findOrFail($id);
+
+        $validated = $request->validate([
+            'email' => 'required|email|unique:users,email,' . $editUser->id,
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
+            'password' => 'nullable|string|min:8',
+            'permissions' => 'nullable|array'
+        ]);
+
+        $data = [
+            'email' => $validated['email'],
+            'first_name' => $validated['first_name'],
+            'last_name' => $validated['last_name'],
+        ];
+
+        if (!empty($validated['password'])) {
+            $data['password'] = Hash::make($validated['password']);
+        }
+
+        if ($editUser->role === UserRole::USER) {
+            $data['access_list'] = $validated['permissions'] ?? [];
+        }
+
+        $editUser->update($data);
+
+        return redirect()->route('user.index')->with('success', 'Користувача оновлено');
     }
 }
